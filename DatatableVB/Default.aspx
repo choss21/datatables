@@ -3,7 +3,7 @@
 <asp:Content ID="BodyContent" ContentPlaceHolderID="MainContent" runat="server">
 
     <h1>TEST table</h1>
-
+    <input type="button" value="Refrescar" onclick="refreshDatatable()"/>
     <table id="table_id" class="display">
         <thead>
             <tr>
@@ -17,8 +17,9 @@
     </table>
 
     <script>
+        var dttable
         $(document).ready(function () {
-            $("#table_id").DataTable({
+            dttable = $("#table_id").DataTable({
                 "processing": true,
                 "serverSide": true,
                 "ajax": {
@@ -32,7 +33,7 @@
                     }
                 },
                 "pageLength": 10,
-                "filter": true,
+                "filter": false,
                 "responsivePriority": 1,
                 "data": null,
                 "columns": [
@@ -41,6 +42,16 @@
                 { "data": "Edad", "name": "Edad", "autoWidth": true }
             ]
             });
+
+            
+
         });
+
+
+        function refreshDatatable() {
+            alert('click');
+            if (dttable == undefined) return;
+            dttable.ajax.reload();
+        }
     </script>
 </asp:Content>
