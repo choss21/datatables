@@ -24,7 +24,9 @@ Public Class WebService1
         'HttpContext.Current.Request.Form.Keys.Count
 
         Dim draw = HttpContext.Current.Request.Form.GetValues("draw").FirstOrDefault()
-
+        Dim test = HttpContext.Current.Request.Form.GetValues("userId").FirstOrDefault()
+        Dim test2 = HttpContext.Current.Request.Form.GetValues("startDate").FirstOrDefault()
+        Dim test3 = HttpContext.Current.Request.Form.GetValues("endDate").FirstOrDefault()
         Dim start = HttpContext.Current.Request.Form.GetValues("start").FirstOrDefault()
         Dim length = HttpContext.Current.Request.Form.GetValues("length").FirstOrDefault()
         Dim sortColumn = HttpContext.Current.Request.Form.GetValues("columns[" + HttpContext.Current.Request.Form.GetValues("order[0][column]").FirstOrDefault() + "][name]").FirstOrDefault()

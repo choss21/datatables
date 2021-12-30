@@ -25,6 +25,11 @@
                     "url": "WebService1.asmx/GetData",
                     "type": "POST",
                     "datatype": "json",
+                    "data": {
+                        "userId": 27,
+                        "startDate": "10-01-2021",
+                        "endDate":"01-02-2021"
+                    }
                 },
                 "pageLength": 10,
                 "filter": true,
