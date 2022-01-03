@@ -14,9 +14,16 @@ Imports Newtonsoft.Json
 Public Class WebService1
     Inherits System.Web.Services.WebService
 
-    <WebMethod()>
-    Public Function HelloWorld() As String
-        Return "Hola a todos"
+    Public Function getAllData() As List(Of Person)
+        Dim allData = New List(Of Person)
+        For i = 1 To 95
+            allData.Add(New Person() With {
+                .Id = i,
+                .Nombre = "Nombre " + i.ToString(),
+                .Edad = i + 17
+                        })
+        Next
+        Return allData
     End Function
     <WebMethod(CacheDuration:=0)>
     <Script.Services.ScriptMethod(ResponseFormat:=ResponseFormat.Json, UseHttpGet:=False, XmlSerializeString:=False)>
@@ -29,34 +36,35 @@ Public Class WebService1
         Dim test3 = HttpContext.Current.Request.Form.GetValues("endDate").FirstOrDefault()
         Dim start = HttpContext.Current.Request.Form.GetValues("start").FirstOrDefault()
         Dim length = HttpContext.Current.Request.Form.GetValues("length").FirstOrDefault()
+
+        Dim testSort = HttpContext.Current.Request.Form.GetValues("order[1]")
         Dim sortColumn = HttpContext.Current.Request.Form.GetValues("columns[" + HttpContext.Current.Request.Form.GetValues("order[0][column]").FirstOrDefault() + "][name]").FirstOrDefault()
         Dim sortColumnDir = HttpContext.Current.Request.Form.GetValues("order[0][dir]").FirstOrDefault()
+
+        Dim searchValue = HttpContext.Current.Request.Form.GetValues("search[value]").FirstOrDefault()
 
         Dim pageSize = If(length <> Nothing, Convert.ToInt32(length), 0)
         Dim skip = If(start <> Nothing, Convert.ToInt32(start), 0)
         Dim recordsTotal = 0
 
+        Dim allData = getAllData()
 
+        If Not (String.IsNullOrEmpty(searchValue)) Then
+            allData = allData.Where(Function(x As Person) x.Nombre.Contains(searchValue)).ToList()
+        End If
+
+        recordsTotal = allData.Count()
 
         Context.Response.Cache.SetExpires(DateTime.Now.AddHours(-1))
 
         Context.Response.ContentType = "application/json"
 
-        Dim data = New List(Of Person)
-        data.Add(New Person() With {
-            .Id = 1,
-            .Nombre = "Hola",
-            .Edad = 18
-                 })
-        data.Add(New Person() With {
-            .Id = 2,
-            .Nombre = "Nombre",
-            .Edad = 19
-                 })
-        recordsTotal = data.Count
+        Dim resultPaged = allData.Skip(skip).Take(pageSize)
+
+        Dim datafiltered = resultPaged.Count()
         'return Json(new { draw=draw, recordsFiltered = recordsTotal, recordsTotal = recordsTotal, data = lst });
         Dim result = Newtonsoft.Json.JsonConvert.SerializeObject(
-            New With {.draw = draw, .recordsFiltered = recordsTotal, .recordsTotal = recordsTotal, .data = data}, Newtonsoft.Json.Formatting.None)
+            New With {.draw = draw, .recordsFiltered = recordsTotal, .recordsTotal = recordsTotal, .data = resultPaged}, Newtonsoft.Json.Formatting.None)
         Context.Response.Write(result)
 
         Context.Response.Flush()
